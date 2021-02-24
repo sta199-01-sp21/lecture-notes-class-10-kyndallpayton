@@ -1,9 +1,11 @@
 ---
 title: "Introduction to probability"
-author: ""
-date: ""
-output: html_document
-editor_options: 
+author: "Kyndall Payton"
+date: "2/23/2021"
+output:
+  pdf_document: default
+  html_document: default
+editor_options:
   chunk_output_type: console
 ---
 
@@ -28,6 +30,8 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
 ```{r packages}
 library(tidyverse)
 library(vcd) # used for Arthritis data
+library(usethis)
+use_git_config(user.name="kyndallpayton", user.email="kp256@duke.edu")
 ```
 
 ## Computing probabilities
@@ -48,18 +52,18 @@ xtabs(~ Treatment + Improved, data = Arthritis) %>%
   addmargins()
 ```
 
-- How many patients were enrolled in the clinical trial?
+- How many patients were enrolled in the clinical trial? 84
 
-- What is the probability a randomly selected patient received the placebo?
+- What is the probability a randomly selected patient received the placebo? 43/84
 
 - What is the probability a randomly selected patient received the placebo
-  and had a marked improvement?
+  and had a marked improvement? 7/84
   
 - What is the probability a randomly selected patient received the placebo
-  and the treatment?
+  and the treatment? 0
   
 - What is the probability a randomly selected patient had some improvement or
-  was on the treatment?
+  was on the treatment? 48/84
 
 ## Using computer simulations to calculate probabilities
 
@@ -74,7 +78,7 @@ marbles <- c("red", "red", "white", "red", "blue", "blue", "red", "blue")
 
 Suppose we draw a single marble from our imaginary box, where all the marbles
 are equally likely to be selected. What is the probability the marble is blue? 
-How about white?
+How about white? 3/8; 1/8
 
 We can simulate this "drawing" with the `sample()` function.
 
@@ -100,7 +104,7 @@ counts <- table(draw_results)
 prop.table(counts)
 ```
 
-How close is this value to the "true" probability?
+How close is this value to the "true" probability? Quite close as red marbles make up half the dataset and its probability for this number of draws is 49.87%. Blue makes up 37.5% of the dataset and its probability for this size is 37.66%. 
 
 **To summarize our process:**
 
@@ -116,7 +120,7 @@ What if we want to compute the probability of getting two marbles of the same
 color if we make two draws with replacement? We haven't discussed how to
 compute this theoretically yet, but this is what computers are good at.
 
-Before we do this, what is your guess as to what the probability will be?
+Before we do this, what is your guess as to what the probability will be? ~1/2, fairly likely
 
 We'll still use `sample()` to run our simulation many times, but we'll
 use `dplyr` functions to compute the relative frequencies.
@@ -155,18 +159,29 @@ difference between dice roll 1 and dice roll 2 is equal to 4.
 
 Perform a simulation to compute this empirical probability.
 
-Write down your guess to the answer before you calculate it.
+Write down your guess to the answer before you calculate it. The probability of scenario 2 is about twice as large as the probability of scenario 1.
 
 ```{r simulate_rolls}
-
+dice = c(1:6)
+print(dice)
+roll_results<- tibble(
+die_1= replicate(n= 10000, expr= sample(dice, size= 1)),
+die_2= replicate(n=10000, expr= sample(dice, size = 1))
+)
 ```
 
 ```{r identify_events}
+roll_results<-
+  roll_results %>% 
+  mutate(die1_squared = die_2== die_1*die_1,
+         absolute_val_four= abs(die_1-die_2)==4)
 
 ```
 
 ```{r summarize_rolls}
-
+roll_results %>% 
+  summarize(die1_squared_prob = mean(die1_squared),
+            absolute_val_four_prob = mean(absolute_val_four))
 ```
 
 ## Additional Resources-please look at before Weds.
